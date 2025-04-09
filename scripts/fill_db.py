@@ -115,15 +115,68 @@ def weaknesses_generator(cursor):
     print(f'Добавлено {count} новых записей в таблицу Weaknesses.')
 
 
+def fraction_generator(cursor):
+
+    # Получаем список всех существ
+    cursor.execute('SELECT creature FROM Bestiary')
+    all_creatures = [row[0] for row in cursor.fetchall()]
+
+    if not all_creatures:
+        print("Нет существ в Bestiary для генерации фракций.")
+        return
+
+    # Получаем список уже существующих фракций
+    cursor.execute('SELECT fraction_name FROM Fraction')
+    existing_factions = set(row[0] for row in cursor.fetchall())
+
+    # Получаем список оружий
+    cursor.execute('SELECT name FROM Weapon')
+    weapons = [row[0] for row in cursor.fetchall()]
+
+    if not weapons:
+        print("Нет оружия для генерации фракций.")
+        return
+
+    # Выбираем случайное подмножество существ (например, 80%)
+    num_to_generate = int(len(all_creatures) * random.uniform(0.7, 0.9))
+    chosen_creatures = random.sample(all_creatures, num_to_generate)
+
+    word_lists = [
+        ['сумасшедшие', 'элитные', 'богатые', 'воинственные', 'высокотехнологичные', 'праведные'],
+        ['чернокнижники', 'рыцари', 'буржуи', 'амазонки', 'инфобезники', 'святые отцы'],
+        ['из пещеры', 'на конях', 'со связями', 'из джунглей', 'из киберпанка', 'против насилия']
+    ]
+
+    inserted = 0
+    for creature in chosen_creatures:
+        enemy_name = creature
+
+        # Генерируем имя фракции
+        fraction_name = ''
+        for words in word_lists:
+            fraction_name += words[random.randint(0, len(words)-1)]
+            fraction_name += ' '
+        fraction_name = fraction_name[:-1]
+
+        # Выбираем оружие и врага
+        weapon_name = random.choice(weapons)
+
+        cursor.execute('INSERT INTO Fraction (fraction_name, weapon_name, enemy_name) VALUES (?, ?, ?)',
+                       (fraction_name, weapon_name, enemy_name))
+        inserted += 1
+
+    print(f'Добавлено {inserted} новых записей в таблицу Fraction.')
+
 if __name__ == "__main__":
     
     # Подключение к базе данных (или создание новой)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    weapon_generator(cursor, 1)
-    bestiary_generator(cursor, 10)
+    weapon_generator(cursor, 30)
+    bestiary_generator(cursor, 30)
     weaknesses_generator(cursor)
+    fraction_generator(cursor)
 
     # Сохранение изменений и закрытие соединения
     conn.commit()

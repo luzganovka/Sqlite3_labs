@@ -171,6 +171,36 @@ def fraction_generator(cursor):
 
     print(f'Добавлено {inserted} новых записей в таблицу Fraction.')
 
+
+def player_generator(cursor, num_records):
+    # Получаем все существующие фракции
+    cursor.execute('SELECT fraction_name FROM Fraction')
+    all_factions = [row[0] for row in cursor.fetchall()]
+
+    inserted = 0
+    for i in range(num_records):
+        # Генерация случайного имени игрока
+        name = f"Игрок_{random_string(6)}"
+
+        # Примерно половине назначаем фракцию
+        if all_factions and random.random() < 0.5:
+            fraction = random.choice(all_factions)
+        else:
+            fraction = None
+
+        try:
+            cursor.execute(
+                'INSERT INTO Player (fraction, name) VALUES (?, ?)',
+                (fraction, name)
+            )
+            inserted += 1
+        except sqlite3.IntegrityError:
+            continue  # вдруг имя уже есть — пропускаем
+
+    print(f'Добавлено {inserted} новых игроков в таблицу Player.')
+
+
+
 if __name__ == "__main__":
     
     # Подключение к базе данных (или создание новой)
@@ -179,8 +209,9 @@ if __name__ == "__main__":
 
     weapon_generator(cursor, 30)
     bestiary_generator(cursor, 30)
-    weaknesses_generator(cursor)
-    fraction_generator(cursor)
+    # weaknesses_generator(cursor)
+    # fraction_generator(cursor)
+    player_generator(cursor, 30)
 
     # Сохранение изменений и закрытие соединения
     conn.commit()

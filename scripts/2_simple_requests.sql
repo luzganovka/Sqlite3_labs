@@ -21,7 +21,26 @@ select rarity, name, damage_type
     where rarity >= (select max(rarity) from Weapon group by (select 0))
     order by rarity desc
 ;
+
+SELECT name, rarity
+FROM (
+    SELECT name, rarity,
+           RANK() OVER (ORDER BY rarity DESC) AS rnk
+    FROM Weapon
+)
+WHERE rnk = 1;
+
+-- SELECT name, rarity
+-- FROM Weapon
+-- WHERE RANK() OVER (ORDER BY rarity DESC) = 1;
+
+-- SELECT name, rarity
+-- RANK() OVER (ORDER BY rarity DESC)
+-- FROM Weapon
+-- WHERE RANK() OVER (ORDER BY rarity DESC);
+
 -- delete rarity, name, damage_type from Weapon where rarity >= (select max(rarity) from Weapon group by (select 0)) order by rarity desc;
+
 
 
 -- mean price for weapon of every damage type

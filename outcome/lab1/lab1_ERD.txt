@@ -1,0 +1,69 @@
+@startuml
+' hide the spot
+' hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "Fraction" {
+  *fraction_name : text
+  weapon_name : text
+  enemy_name : text
+  --
+}
+
+entity "Weapon" {
+  *name : text
+  --
+  
+  *basic_damage : real
+  *damage_type : text
+  rarity : text
+  price : real
+  description : text
+  
+}
+
+entity "Player" {
+  *id : integer
+  --
+  fraction : text
+  name : text
+}
+
+entity "Entity" {
+  *id : integer
+  --
+  *owner_id : integer
+  *weapon_name : text
+  *weapon_level : integer
+}
+
+entity "Weaknesses" {
+  *creature : text
+  *damage_type : text
+  --
+  damage_modifier : integer
+}
+
+entity "Bestiary" {
+  *creature : text
+  --
+  biome : text
+  danger : integer
+}
+
+
+
+Weapon ||--o{ Entity
+Player |o--o{ Entity
+Fraction |o--o{ Player
+Fraction }o--o| Weapon
+Fraction_Enemy |o--o{ Player
+Fraction_Enemy }o--|| Bestiary
+'Fraction_Weapon }o--o{ Fraction_Enemy
+'We need this relation but plantuml just draw it scary
+Weapon }o--o{ Weaknesses
+Bestiary ||--o{ Weaknesses
+
+@enduml

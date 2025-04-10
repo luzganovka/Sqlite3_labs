@@ -1,0 +1,9 @@
+*.db
+*.exe
+*.docx
+*tmp/*
+*tasks/*
+
+
+!*.sql
+!*.py

@@ -200,6 +200,42 @@ def player_generator(cursor, num_records):
     print(f'Добавлено {inserted} новых игроков в таблицу Player.')
 
 
+def entity_generator(cursor, num_records):
+    # Получаем все ID игроков
+    cursor.execute('SELECT id FROM Player')
+    player_ids = [row[0] for row in cursor.fetchall()]
+
+    # Получаем все названия оружия
+    cursor.execute('SELECT name FROM Weapon')
+    weapon_names = [row[0] for row in cursor.fetchall()]
+
+    if not weapon_names:
+        print("Нет оружия для генерации Entity.")
+        return
+
+    inserted = 0
+    for _ in range(num_records):
+        weapon_name = random.choice(weapon_names)
+        weapon_level = random_int(1, 10)
+
+        # 80% шанс назначить владельца
+        if player_ids and random.random() < 0.8:
+            owner_id = random.choice(player_ids)
+        else:
+            owner_id = None
+
+        try:
+            cursor.execute(
+                'INSERT INTO Entity (owner_id, weapon_name, weapon_level) VALUES (?, ?, ?)',
+                (owner_id, weapon_name, weapon_level)
+            )
+            inserted += 1
+        except sqlite3.IntegrityError:
+            continue
+
+    print(f'Добавлено {inserted} новых сущностей в таблицу Entity.')
+
+
 
 if __name__ == "__main__":
     
@@ -207,11 +243,12 @@ if __name__ == "__main__":
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    weapon_generator(cursor, 30)
-    bestiary_generator(cursor, 30)
-    # weaknesses_generator(cursor)
-    # fraction_generator(cursor)
-    player_generator(cursor, 30)
+    weapon_generator    (cursor, 30)
+    bestiary_generator  (cursor, 30)
+    weaknesses_generator(cursor)
+    fraction_generator  (cursor)
+    player_generator    (cursor, 30)
+    entity_generator    (cursor, 60)
 
     # Сохранение изменений и закрытие соединения
     conn.commit()

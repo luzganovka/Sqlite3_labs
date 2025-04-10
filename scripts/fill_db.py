@@ -161,6 +161,10 @@ def fraction_generator(cursor):
         # Выбираем оружие и врага
         weapon_name = random.choice(weapons)
 
+        cursor.execute('SELECT 1 FROM Fraction WHERE fraction_name = ?', (fraction_name,))
+        if cursor.fetchone():
+            continue  # имя уже существует, пробуем другое
+
         cursor.execute('INSERT INTO Fraction (fraction_name, weapon_name, enemy_name) VALUES (?, ?, ?)',
                        (fraction_name, weapon_name, enemy_name))
         inserted += 1

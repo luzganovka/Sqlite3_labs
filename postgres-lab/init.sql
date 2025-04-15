@@ -1,17 +1,3 @@
--- -- Создание пользователя
--- CREATE USER myuser WITH PASSWORD 'mypassword';
-
--- -- Создание базы данных
--- CREATE DATABASE mydb OWNER myuser;
-
--- -- Назначение прав
--- GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
-
--- -- (Опционально) Переключение на базу и создание расширений, если нужно
--- \connect mydb;
-
-
-
 -- Таблица оружия
 CREATE TABLE Weapon (
     name TEXT PRIMARY KEY,
@@ -48,7 +34,7 @@ CREATE TABLE Weaknesses (
 -- Таблица сущностей (владение оружием)
 CREATE TABLE Entity (
     id SERIAL PRIMARY KEY,
-    owner_id INTEGER NOT NULL,
+    owner_id INTEGER,
     weapon_name TEXT NOT NULL,
     weapon_level INTEGER NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES Player(id) ON DELETE CASCADE,

@@ -1,13 +1,14 @@
 import psycopg2
 import random
 import string
+import time
 
 # Настройки подключения к PostgreSQL (укажи свои значения)
 DB_CONFIG = {
-    'dbname': 'your_db_name',
-    'user': 'your_user',
-    'password': 'your_password',
-    'host': 'your_postgres_container_name_or_ip',
+    'dbname': 'mydb',
+    'user': 'pgroot',
+    'password': '123',
+    'host': 'db',
     'port': 5432
 }
 
@@ -150,6 +151,8 @@ def entity_generator(cursor, num_records):
     print(f'Добавлено {inserted} новых сущностей в таблицу Entity.')
 
 if __name__ == "__main__":
+    
+    time.sleep(5)
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         conn.autocommit = True

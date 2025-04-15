@@ -1,0 +1,27 @@
+# version: "3.9"
+
+services:
+
+  db:
+    image: postgres:17.4
+    container_name: my_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pgroot
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: mydb
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  app:
+    build: ./app
+    container_name: my_app
+    depends_on:
+      - db
+    volumes:
+      - ./app/scripts:/app/scripts
+    environment:
+      DATABASE_URL: postgres://pgroot:123@db:5432/mydb
+    command: python /app/scripts/fill_db.py

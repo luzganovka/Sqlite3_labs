@@ -21,7 +21,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ./scripts:/app/scripts
+      - ./app/scripts:/app/scripts
     environment:
       DATABASE_URL: postgres://pgroot:123@db:5432/mydb
     command: python /app/scripts/fill_db.py

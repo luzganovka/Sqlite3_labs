@@ -1,31 +1,31 @@
 --создать группу существ
-WITH enemies AS (
+WITH Enemies AS (
     SELECT creature
-    FROM (
-        SELECT creature,
-            RANK() OVER (ORDER BY creature DESC) AS rnk
-        FROM Bestiary
-    )
-    WHERE rnk = 1 OR rnk = 20 OR rnk = 40
+    FROM Bestiary
+    ORDER BY RANDOM()
+    LIMIT 5
 ),
 --выбрать партию игроков
-heroes AS (
+Heroes AS (
     SELECT id
     FROM Player
-    WHERE id = 1 OR id = 5 OR id = 10
+    ORDER BY RANDOM()
+    LIMIT 2
 ),
 --выбрать всё оружте игроков
-heroes_arsenal AS (
+HeroesArsenal AS (
     SELECT id
     FROM Entity
-    WHERE owner_id IN heroes
+    WHERE owner_id IN Heroes
 )
 
 --рассчитать эффективность оружия против группы
-SELECT Entity.id, Weapon.basic_damage * Entity.weapon_level * (Weaknesses.damage_modifier / 100), Weaknesses.creature
+SELECT Entity.id,
+    Weapon.basic_damage * Entity.weapon_level * (Weaknesses.damage_modifier / 100) AS efficiency,
+    Weaknesses.creature
 FROM Entity
 JOIN Weapon ON Entity.weapon_name = Weapon.name
 JOIN Weaknesses ON Weapon.damage_type = Weaknesses.damage_type
-WHERE Weaknesses.creature IN enemies
-AND Entity.id IN heroes_arsenal
+WHERE Weaknesses.creature IN Enemies
+AND Entity.id IN HeroesArsenal
 ;

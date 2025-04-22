@@ -38,16 +38,32 @@ AllWeaknesses AS (
 
 --рассчитать эффективность оружия против группы
 Efficiency AS (
-    SELECT Entity.id,
-        Weapon.basic_damage * Entity.weapon_level * (AllWeaknesses.damage_modifier / 100) AS efficiency,
-        AllWeaknesses.creature
+    SELECT
+        Entity.id AS eid,
+        Weapon.name AS wname,
+        Weapon.basic_damage * Entity.weapon_level * (AllWeaknesses.damage_modifier / 100) AS eff,
+        AllWeaknesses.creature AS creature
     FROM Entity
     JOIN Weapon ON Entity.weapon_name = Weapon.name
     JOIN AllWeaknesses ON Weapon.damage_type = AllWeaknesses.damage_type
     WHERE AllWeaknesses.creature IN Enemies
     AND Entity.id IN HeroesArsenal
+),
+
+-- Average efficiency of certain entity against the whole group
+AvgEff AS (
+    SELECT eid, wname, AVG(eff) as avgeff
+    FROM Efficiency
+    GROUP BY eid
+),
+
+-- TODO: select top 2 ordered by avgeff
+TopEff AS (
+    SELECT eid, wname, avgeff
+    FROM AvgEff
+    ORDER BY avgeff DESC
+    LIMIT 2
 )
 
-
 -- MAIN
-SELECT * FROM Efficiency;
+SELECT * FROM TopEff;

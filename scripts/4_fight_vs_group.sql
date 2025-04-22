@@ -17,15 +17,37 @@ HeroesArsenal AS (
     SELECT id
     FROM Entity
     WHERE owner_id IN Heroes
-)
+),
+
+-- Все существующие типы урона - вспомагательный для следующего
+AllDamageTypes AS (
+    SELECT DISTINCT damage_type FROM Weapon
+),
+-- Все возможные комбинации существ и типов урона, включая отсутствующие
+AllWeaknesses AS (
+    SELECT 
+        Bestiary.creature,
+        AllDamageTypes.damage_type,
+        IFNULL(Weaknesses.damage_modifier, 100) AS damage_modifier
+    FROM Bestiary
+    CROSS JOIN AllDamageTypes
+    LEFT JOIN Weaknesses 
+        ON Bestiary.creature = Weaknesses.creature 
+        AND AllDamageTypes.damage_type = Weaknesses.damage_type
+),
 
 --рассчитать эффективность оружия против группы
-SELECT Entity.id,
-    Weapon.basic_damage * Entity.weapon_level * (Weaknesses.damage_modifier / 100) AS efficiency,
-    Weaknesses.creature
-FROM Entity
-JOIN Weapon ON Entity.weapon_name = Weapon.name
-JOIN Weaknesses ON Weapon.damage_type = Weaknesses.damage_type
-WHERE Weaknesses.creature IN Enemies
-AND Entity.id IN HeroesArsenal
-;
+Efficiency AS (
+    SELECT Entity.id,
+        Weapon.basic_damage * Entity.weapon_level * (AllWeaknesses.damage_modifier / 100) AS efficiency,
+        AllWeaknesses.creature
+    FROM Entity
+    JOIN Weapon ON Entity.weapon_name = Weapon.name
+    JOIN AllWeaknesses ON Weapon.damage_type = AllWeaknesses.damage_type
+    WHERE AllWeaknesses.creature IN Enemies
+    AND Entity.id IN HeroesArsenal
+)
+
+
+-- MAIN
+SELECT * FROM Efficiency;

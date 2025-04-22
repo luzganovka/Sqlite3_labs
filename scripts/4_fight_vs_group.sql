@@ -36,14 +36,25 @@ AllWeaknesses AS (
         AND AllDamageTypes.damage_type = Weaknesses.damage_type
 ),
 
+-- рассчитать дамаг в зависимости от уровня, но без учёта модиыимкаторов
+LevelDamage AS (
+    SELECT 
+        Entity.id AS eid,
+        Weapon.basic_damage * (1 + log(Entity.weapon_level + 1)) AS dmg
+    FROM Entity
+    JOIN Weapon ON Entity.weapon_name = Weapon.name
+    JOIN HeroesArsenal ON Entity.id = HeroesArsenal.id
+),
+
 --рассчитать эффективность оружия против группы
 Efficiency AS (
     SELECT
         Entity.id AS eid,
         Weapon.name AS wname,
-        Weapon.basic_damage * Entity.weapon_level * (AllWeaknesses.damage_modifier / 100) AS eff,
+        dmg * (AllWeaknesses.damage_modifier / 100) AS eff,
         AllWeaknesses.creature AS creature
     FROM Entity
+    JOIN LevelDamage ON Entity.id = LevelDamage.eid
     JOIN Weapon ON Entity.weapon_name = Weapon.name
     JOIN AllWeaknesses ON Weapon.damage_type = AllWeaknesses.damage_type
     WHERE AllWeaknesses.creature IN Enemies

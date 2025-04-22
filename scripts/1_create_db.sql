@@ -5,6 +5,7 @@ CREATE TABLE Weapon (
     name TEXT PRIMARY KEY,
     basic_damage REAL NOT NULL,
     damage_type TEXT NOT NULL,
+    cooldown INT NOT NULL, --(мс/удар) - минимальное время (в мс) между двумя ударами (НЕ СКОРОСТЬ)
     rarity INTEGER,
     price REAL,
     description TEXT

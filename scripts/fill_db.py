@@ -2,7 +2,7 @@ import sqlite3
 import random
 import string
 
-DB_PATH = '../mydb.db'
+DB_PATH = 'mydb.db'
 NEW_RECORDS = 10
 
 def random_int(min_value=1, max_value=10):
@@ -56,12 +56,13 @@ def weapon_generator(cursor, num_records):
 
         basic_damage = random_real(1, 100)
         damage_type = random.choice(damage_types)
+        cooldown = random_int(500, 10000) # от 0.5 до 10 секунд
         rarity = random_int(1, 10)
         price = random_real(1, 1000)
         description = random_string(random_int(1, 50))
 
-        cursor.execute('INSERT INTO Weapon (name, basic_damage, damage_type, rarity, price, description) VALUES (?, ?, ?, ?, ?, ?)',
-                       (name, basic_damage, damage_type, rarity, price, description))
+        cursor.execute('INSERT INTO Weapon (name, basic_damage, damage_type, cooldown, rarity, price, description) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                       (name, basic_damage, damage_type, cooldown, rarity, price, description))
         inserted += 1
 
     print(f'Добавлено {inserted} новых записей в таблицу Weapon.')
